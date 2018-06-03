@@ -59,6 +59,18 @@ void write_num16(long long int n) {
     safe_write(&(s[i]));
 }
 
+void write_num16char(char n) {
+    char s[3];
+    memset(s, 0, 3);
+    for (size_t i = 0; i < 2; ++i) {
+        s[1 - i] = digits[(n & (((unsigned long long) 1) << (i * 4))) >> (i * 4)];
+    }
+    safe_write("0x");
+    int i;
+//    for (i = 0; i < 1 && s[i] == '0'; ++i);
+    safe_write(&(s[i]));
+}
+
 void hprintf(char *str, long long int num) {
     safe_write(str);
     safe_write(": ");
