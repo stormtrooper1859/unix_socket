@@ -1,18 +1,18 @@
 #define _GNU_SOURCE
 
-#include <features.h>
+//#include <features.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <signal.h>
 #include <ucontext.h>
-#include <sys/ucontext.h>
+//#include <sys/ucontext.h>
 #include <bits/types/stack_t.h>
 #include <bits/types/sigset_t.h>
 #include <bits/types/siginfo_t.h>
-#include <fcntl.h>
-#include <string.h>
-#include <stdlib.h>
+//#include <fcntl.h>
+//#include <stdlib.h>
 #include <errno.h>
 #include "utility.h"
 
@@ -31,6 +31,7 @@ int regnum[num_of_reg] = {REG_RAX, REG_RBX, REG_RCX, REG_RDX, REG_RSI, REG_RDI, 
                           REG_R9, REG_R10, REG_R11, REG_R12, REG_R13, REG_R14, REG_R15, REG_RIP, REG_EFL};
 
 static void handler(int signum, siginfo_t *info, void *ptr) {
+    if (signum != SIGSEGV) return;
     if (first_time) {
 
         ucontext_t *uc = ptr;
@@ -109,7 +110,7 @@ static void handler(int signum, siginfo_t *info, void *ptr) {
         if ((cur_pos) % 8 == 0) safe_write("\n");
         cur_pos += 1;
         failaddress += 1;
-        write_num16(*failaddress);
+        write_num16char(*failaddress);
         safe_write(" ");
     } while (cur_pos < 2 * DELTA);
 
@@ -132,6 +133,9 @@ int main() {
     struct sigaction sa;
 
     sa.sa_sigaction = handler;
+    __sigset_t tmp;
+    sigemptyset(&tmp);
+    sa.sa_mask = tmp;
     sa.sa_flags = SA_SIGINFO | SA_NODEFER;
 
     sigaction(SIGSEGV, &sa, NULL);
