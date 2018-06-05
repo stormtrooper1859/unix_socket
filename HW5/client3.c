@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
+#define BUFLEN 1024
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -29,10 +31,30 @@ int main(int argc, char *argv[]) {
         perror("connect");
     }
 
-    char buf[100];
+    char buf[BUFLEN];
     scanf("%s", buf);
-    send(sock, buf, sizeof(buf), 0);
-    memset(buf, 0, 100);
+
+    ssize_t sended = 0;
+    ssize_t t = 0;
+    if((t = write(sock, &(buf[sended]), BUFLEN - sended)) > 0){
+        sended += t;
+    }
+    if(t == -1){
+        perror("write");
+        exit(EXIT_FAILURE);
+    }
+
+    memset(buf, 0, BUFLEN);
+
+    ssize_t readed = 0;
+    if((t = read(sock, &(buf[readed]), BUFLEN - readed)) > 0){
+        readed += t;
+    }
+    if(t == -1){
+        perror("read");
+        exit(EXIT_FAILURE);
+    }
+
     recv(sock, buf, sizeof(buf), 0);
     printf("%s\n", buf);
     close(sock);

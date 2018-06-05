@@ -6,6 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define BUFLEN 1024
+
 int main(int argc, char *argv[]) {
 
     if (argc != 2) {
@@ -33,9 +35,27 @@ int main(int argc, char *argv[]) {
     socklen_t ac_addrlen;
     while (1) {
         int ac_sock = accept(sock, &ac_addr, &ac_addrlen);
-        char cb[100];
-        ssize_t r = recv(ac_sock, cb, 100, 0);
-        ssize_t s = send(ac_sock, cb, 100, 0);
+        char cb[BUFLEN];
+
+        ssize_t readed = 0;
+        ssize_t t = 0;
+        if((t = read(ac_sock, &(cb[readed]), BUFLEN - readed)) != 0){
+            readed += t;
+        }
+        if(t == -1){
+            perror("read");
+            exit(EXIT_FAILURE);
+        }
+
+        ssize_t sended = 0;
+        if((t = write(ac_sock, &(cb[sended]), BUFLEN - sended)) != 0){
+            sended += t;
+        }
+        if(t == -1){
+            perror("write");
+            exit(EXIT_FAILURE);
+        }
+
         shutdown(ac_sock, SHUT_RDWR);
         close(ac_sock);
     }
