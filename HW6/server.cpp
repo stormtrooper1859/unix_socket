@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
                 userT &user = users[cur_fd];
                 if (events[i].events & EPOLLRDHUP) {
                     printf("%s disconnected\n", user.name.data());
-                    new_messages.append(user.name + " disconnected\n");
+                    new_messages.append(user.name + " disconnected");
                     users.erase(cur_fd);
                     epoll_ctl(efd, EPOLL_CTL_DEL, cur_fd, nullptr);
                 } else {
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
                         if (user.state == 0) {
                             user.name = msg;
                             user.state++;
-                            new_messages.append(user.name + " connected\n");
+                            new_messages.append(user.name + " connected");
                             printf("%s connected\n", user.name.data());
                         } else {
                             new_messages.append(user.name + ": " + msg);
